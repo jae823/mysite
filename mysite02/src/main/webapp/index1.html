@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>mysite</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+	<script type="text/javascript">
+		var xhr = new XMLHttpRequest();
+		var innerText = "";
+		var urlResult;
+		var srcResult;
+		var URLPattern = /href=\"(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?\"/igm;
+		var SrcPattern = /src=\"\bhttps?.\/\/\S+\"/igm;
+		var matchArray;
+
+		function getHTML() {
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState == 4 && xhr.status == 200) {
+					innerText = xhr.responseText
+					document.getElementById("success").innerText = "HTML GET Success!";
+				}
+			}
+			xhr.open("GET", document.getElementById("inputurl").value);
+			xhr.send();
+		}
+
+		function openTextFile() {
+		    var input = document.createElement("input");
+		    input.type = "file";
+		    input.accept = "text/plain"; 
+		    input.onchange = function (event) {
+		        processFile(event.target.files[0]);
+		    };
+		    input.click();
+		}
+		
+		function processFile(file) {
+		    var reader = new FileReader();
+		    reader.onload = function () {
+		    	innerText = reader.result;
+		    };
+		    reader.readAsText(file, "UTF-8");
+		}
+		
+		function findURL() {
+			urlResult = new Array();
+			while ((matchArray = URLPattern.exec(innerText)) != null) {
+				urlResult.push(matchArray[0]);
+			}
+			document.getElementById("url").innerText = "총 URL 개수 : "
+					+ urlResult.length + "\n" + urlResult;
+		}
+
+		function findSrc() {
+			srcResult = new Array();
+			while ((matchArray = SrcPattern.exec(innerText)) != null) {
+				srcResult.push(matchArray[0]);
+			}
+			document.getElementById("src").innerText = "총 이미지 개수 : "
+					+ srcResult.length + "\n" + srcResult;
+		}
+	</script>
+	<input id="inputurl" type="text" value="">
+	<button onClick="getHTML()">getHTML</button>
+	<button onClick="findURL()">URLTry</button>
+	<button onClick="findSrc()">SrcTry</button>
+	<p id="success"></p>
+	<p id="url"></p>
+	<p id="src"></p>
+	
+	<br>
+	getHTML로 url을 받아 처리하도록 하였으나 CROS이슈로 파일첨부로 변경하였습니다.<br>
+	네이버 홈페이지 파일을 첨부하시고 URLTry, SrcTry를 클릭하시면 동작합니다.<br><br>
+	<button onclick="openTextFile()">Open</button>
+</body>
+</html>
